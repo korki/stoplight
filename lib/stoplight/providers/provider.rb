@@ -43,6 +43,7 @@ module Stoplight::Providers
     end
 
     protected
+
     # Makes a request to the given server `url` and assigns an instance variable
     # `@response` to the result. It only returns a string. The `result` method is
     # responsible for parsing the string into a usable hash.
@@ -54,19 +55,17 @@ module Stoplight::Providers
     def load_server_data(options = {})
       url = @options['url'].chomp('/') + '/' + (options[:path] || builds_path).chomp('/').reverse.chomp('/').reverse
 
-      url_options = {}
+      url_options = { headers: { 'User-Agent' => 'stoplight' } }
 
       if @options['username'] || @options['password']
         url_options[:basic_auth] = {
-          :username => @options['username'],
-          :password => @options['password']
+          username: @options['username'],
+          password: @options['password']
         }
       end
 
       if @options['owner_name']
-        url_options[:query] = {
-          :owner_name => @options['owner_name']
-        }
+        url_options[:query] = { owner_name: @options['owner_name'] }
       end
 
       url_options[:http_proxyaddr] ||= @options['http_proxyaddr']
@@ -75,9 +74,8 @@ module Stoplight::Providers
       url_options[:http_proxypass] ||= @options['http_proxypass']
 
       # merge with any additional options provided
-      url_options.merge(options[:url_options]) if options[:url_options]
-
-      url_options.delete_if { |k,v| v.nil? }
+      url_options.merge!(options[:url_options]) if options[:url_options]
+      url_options.delete_if { |k, v| v.nil? }
 
       http_method = options[:method] || 'get'
       response = HTTParty.send(http_method.downcase.to_sym, url, url_options)

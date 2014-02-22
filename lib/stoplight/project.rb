@@ -53,11 +53,12 @@ module Stoplight
       @last_build_status == 'failed'
     end
 
-    def <=>(other_project)
-      self.name.downcase <=> other_project.name.downcase
+    def <=>(other)
+      self.name.downcase <=> other.name.downcase
     end
 
     private
+
     # returns the correct time from the given project time
     def parse_date(date_time)
       return nil if date_time.nil? || date_time.empty?
